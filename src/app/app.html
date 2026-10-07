@@ -1,0 +1,97 @@
+<main class="notes-app">
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="Заметки, на главную">
+      <span class="brand-mark" aria-hidden="true">n</span>
+      <span>листок</span>
+    </a>
+    <span class="topbar-label">ЛИЧНОЕ ПРОСТРАНСТВО</span>
+  </header>
+
+  <section class="workspace" aria-labelledby="page-title">
+    <div class="page-heading">
+      <div>
+        <p class="eyebrow">ВАШИ МЫСЛИ, СОБРАННЫЕ В ОДНОМ МЕСТЕ</p>
+        <h1 id="page-title">Заметки<span class="heading-period">.</span></h1>
+        <p class="page-description">Записывайте важное, чтобы освободить место для нового.</p>
+      </div>
+      <button class="new-note-button" type="button" (click)="isCreating.set(true)">
+        <span class="plus-icon" aria-hidden="true">+</span>
+        Новая заметка
+      </button>
+    </div>
+
+    @if (isCreating()) {
+      <form class="note-form" (ngSubmit)="createNote()">
+        <div class="form-heading">
+          <h2>Новая заметка</h2>
+          <button class="icon-button close-button" type="button" aria-label="Закрыть форму" (click)="cancelCreation()">×</button>
+        </div>
+        <label class="field-label" for="note-title">Заголовок</label>
+        <input
+          id="note-title"
+          name="title"
+          type="text"
+          placeholder="Например, идеи на неделю"
+          maxlength="80"
+          required
+          [(ngModel)]="title"
+          autofocus
+        />
+        <label class="field-label" for="note-content">Текст заметки</label>
+        <textarea
+          id="note-content"
+          name="content"
+          placeholder="Запишите то, что важно не забыть..."
+          rows="5"
+          maxlength="2000"
+          required
+          [(ngModel)]="content"
+        ></textarea>
+        <div class="form-actions">
+            @if (saveError()) {
+              <p class="form-error" role="alert">{{ saveError() }}</p>
+            }
+          <button class="text-button" type="button" (click)="cancelCreation()">Отмена</button>
+          <button class="save-button" type="submit">Сохранить заметку</button>
+        </div>
+      </form>
+    }
+
+    @if (loadError()) {
+      <p class="load-error" role="alert">{{ loadError() }}</p>
+    }
+
+    @if (notes().length) {
+      <div class="notes-toolbar">
+        <h2>Все заметки <span>{{ notes().length }}</span></h2>
+        <span class="sort-label">Сначала новые</span>
+      </div>
+      <div class="notes-grid">
+        @for (note of notes(); track note.id) {
+          <article class="note-card">
+            <time [attr.datetime]="note.createdAt">
+              {{ note.createdAt | date:'d MMMM yyyy, HH:mm':'':'ru' }}
+            </time>
+            <h3>{{ note.title }}</h3>
+            <p>{{ note.content }}</p>
+          </article>
+        }
+      </div>
+    } @else if (!isCreating()) {
+      <div class="empty-state">
+        <div class="empty-illustration" aria-hidden="true">
+          <span class="paper-line line-one"></span>
+          <span class="paper-line line-two"></span>
+          <span class="paper-line line-three"></span>
+          <span class="sparkle">✳</span>
+        </div>
+        <h2>Пока здесь чистый лист</h2>
+        <p>Начните с небольшой заметки — она появится здесь.</p>
+        <button class="empty-create-button" type="button" (click)="isCreating.set(true)">
+          <span aria-hidden="true">+</span> Создать первую заметку
+        </button>
+      </div>
+    }
+  </section>
+</main>
+<router-outlet />
